@@ -1,7 +1,10 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
+ <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>EPhone</title>
     <!-- ▼▼▼ 【桌面图标】纯HTML单文件方案，请粘贴到 <title> 之后 ▼▼▼ -->
     <!-- 1. (核心) 为苹果设备设置主屏幕图标 -->
     <!-- 浏览器会自动选择最合适的尺寸 -->
@@ -21,24 +24,15 @@
     <!-- 6. (备用) 标准浏览器页签图标 -->
     <link rel="icon" type="image/png" href="https://s3plus.meituan.net/opapisdk/op_ticket_885190757_1756312261242_qdqqd_g0eriz.jpeg">
     <!-- ▲▲▲ 粘贴结束 ▲▲▲ -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-
-<meta name="apple-mobile-web-app-capable" content="yes">
-    <link rel="apple-touch-icon" href="https://i.postimg.cc/LsDj0HsL/99985605cd73e222fa4ad523333b0706.jpg">
+    <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-
-    <title>EPhone</title>
-
-
-
     <script src="https://unpkg.com/dexie/dist/dexie.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/dompurify/dist/purify.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         @font-face { font-family: 'bulangni'; src: url('') format('truetype'); font-weight: normal; font-style: normal; font-display: swap; }
-        :root { --screen-width: 350px; --screen-height: 650px; --secondary-bg: #ffffff; --border-color: #e0e0e0; --text-primary: #1f1f1f; --text-secondary: #8a8a8a; --accent-color: #007bff;   --status-bar-text-color: #000000; }
-        html { height: 100%; overflow: hidden; }
-
+        :root { --screen-width: 350px; --screen-height: 650px; --secondary-bg: #ffffff; --border-color: #e0e0e0; --text-primary: #1f1f1f; --text-secondary: #8a8a8a; --accent-color: #007bff; }
+               /* ▼▼▼ Safari键盘适配：请用下面这【一整块】全新的代码，替换掉你现有的 html, body, 和 #phone-screen 样式 ▼▼▼ */
+        
 /* ▼▼▼ 请用下面这【一整块】全新的代码，替换掉所有旧的 body, phone-frame, phone-screen 等样式 ▼▼▼ */
 
 /* 1. 重置 body，使其成为一个干净的画布 */
@@ -25074,4 +25068,5 @@ async function handleCharacterDataDeletion(dataType, index) {
 <!-- ▲▲▲ 文件选择器结束 ▲▲▲ -->
 </body>
 </html>
+
 
