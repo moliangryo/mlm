@@ -29,32 +29,38 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         @font-face { font-family: 'bulangni'; src: url('') format('truetype'); font-weight: normal; font-style: normal; font-display: swap; }
-        :root { --screen-width: 350px; --screen-height: 650px; --secondary-bg: #ffffff; --border-color: #e0e0e0; --text-primary: #1f1f1f; --text-secondary: #8a8a8a; --accent-color: #007bff; }
-               /* ▼▼▼ Safari键盘适配：请用下面这【一整块】全新的代码，替换掉你现有的 html, body, 和 #phone-screen 样式 ▼▼▼ */
-        
-/* ▼▼▼ 请用下面这【一整块】全新的代码，替换掉所有旧的 body, phone-frame, phone-screen 等样式 ▼▼▼ */
+        :root { 
+  --screen-width: 100vw;   /* 自动占满屏幕宽度 */
+  --screen-height: 100vh;  /* 自动占满屏幕高度 */
+  --secondary-bg: #ffffff; 
+  --border-color: #e0e0e0; 
+  --text-primary: #1f1f1f; 
+  --text-secondary: #8a8a8a; 
+  --accent-color: #007bff; 
+}
 
 /* 1. 重置 body，使其成为一个干净的画布 */
 body {
+    width: 100%;
     height: 100%;
-    overflow: hidden;
     margin: 0;
+    overflow: hidden;   /* 🚫 不允许滚动 */
     font-family: 'bulangni', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     font-weight: normal;
-    /* 背景色可以根据喜好设定，这里用一个柔和的颜色 */
-    background-color: #f0f2f5; 
+    background-color: #f0f2f5;
 }
 
-/* 2. 让 #phone-screen 成为新的“根”容器，撑满整个浏览器窗口 */
+/* 2. 让 #phone-screen 撑满整个浏览器窗口 */
 #phone-screen {
     width: 100%;
     height: 100%;
     position: relative;
-    overflow: hidden;
+    overflow: hidden;   /* 🚫 内部也不滚动 */
     display: flex;
     flex-direction: column;
-    background-color: #fff; 
+    background-color: #fff;
 }
+
 
 /* 3. 【核心】隐藏掉模拟器的状态栏 */
 #status-bar {
@@ -25067,6 +25073,7 @@ async function handleCharacterDataDeletion(dataType, index) {
 <!-- ▲▲▲ 文件选择器结束 ▲▲▲ -->
 </body>
 </html>
+
 
 
 
