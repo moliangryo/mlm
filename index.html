@@ -45,51 +45,52 @@
         @font-face { font-family: 'bulangni'; src: url('') format('truetype'); font-weight: normal; font-style: normal; font-display: swap; }
         :root { --screen-width: 350px; --screen-height: 650px; --secondary-bg: #ffffff; --border-color: #e0e0e0; --text-primary: #1f1f1f; --text-secondary: #8a8a8a; --accent-color: #007bff; }
                /* ▼▼▼ Safari键盘适配：
-/* ▼▼▼ 请用下面这【一整块】全新的代码，替换掉所有旧的 body, phone-frame, phone-screen 等样式 ▼▼▼ */
-
-/* 1. 重置 body，使其成为一个干净的画布 */
-body {
-    height: 100%;
-    overflow: hidden;
-    margin: 0;
-    font-family: 'bulangni', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    font-weight: normal;
-    /* 背景色可以根据喜好设定，这里用一个柔和的颜色 */
-    background-color: #f0f2f5; 
-}
-
-/* 2. 让 #phone-screen 成为新的“根”容器，撑满整个浏览器窗口 */
-#phone-screen {
-    width: 100%;
-    height: 100%;
-    position: relative;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    background-color: #fff; 
-}
-
-/* 3. 【核心】隐藏掉模拟器的状态栏 */
-#status-bar {
-    display: none;
-}
-
-/* 4. 【核心】让所有页面的头部自动适应iPhone的“刘海”安全区 */
-.header, .qzone-header {
-    /* 使用 env(safe-area-inset-top) 自动获取顶部安全距离 */
-    padding-top: calc(15px + env(safe-area-inset-top));
-}
-
-/* 5. 【核心】让聊天输入框和底部导航栏自动适应iPhone底部的“小黑条”安全区 */
-#chat-input-area {
-    padding-bottom: calc(8px + env(safe-area-inset-bottom));
-}
-
-#chat-list-bottom-nav {
-     padding-bottom: env(safe-area-inset-bottom);
-}
-
-/* ▲▲▲ 替换结束 ▲▲▲ */
+ /* --- 请用下面这【一整块】全新的代码，替换掉你现有的 html, body, 和 #phone-screen 样式 --- */
+        
+        /* 1. 重置 html 元素 */
+        html {
+            -webkit-text-size-adjust: 100%;
+            height: 100%; /* 确保html元素也能撑满 */
+        }
+        
+        /* 2. 设置 body 为全屏画布 */
+        body {
+            margin: 0;
+            font-family: 'bulangni', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-weight: normal;
+            background-color: #f0f2f5;
+            height: 100%; /* 让body也撑满父元素(html) */
+            overflow: hidden; /* 防止body本身出现滚动条 */
+        }
+        
+        /* --- Start of Replacement Code --- */
+        
+        #phone-screen {
+            width: 100%;
+            /* Use 100vh to ensure it fills the entire screen height */
+            height: 100vh; 
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            background-color: #ffffff; /* Your desired white background */
+        }
+        
+        #chat-input-area {
+            flex-shrink: 0;
+            padding: 8px;
+            /* This is the key: adds padding equal to the height of the "black bar" */
+            padding-bottom: calc(8px + env(safe-area-inset-bottom)); 
+            background-color: rgba(247, 247, 247, 0.8);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        /* --- End of Replacement Code --- */
 
     
 	/* --- 【核心修改】这是控制状态栏显隐的新样式 --- */
@@ -25129,4 +25130,5 @@ async function handleCharacterDataDeletion(dataType, index) {
 <!-- ▲▲▲ 文件选择器结束 ▲▲▲ -->
 </body>
 </html>
+
 
