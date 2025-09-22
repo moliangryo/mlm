@@ -10860,8 +10860,22 @@ const privateChatAvatarUrls = [
 ];
 
 const groupChatAvatarUrl = 'https://i.postimg.cc/k5xrJ1qQ/IMG-2020.jpg';
+       // ★★★ 新增：您的相册URL列表 ★★★
+        const albumPhotoUrls = [
+            'https://i.postimg.cc/1R8CKDqX/1040g00831btiu9dfgk2g5pm8aeo3cu7d2ujvs80-nd-dft-w.jpg',
+            'https://i.postimg.cc/DfRCpmrg/1040g00831btiu9dfgm6g5pm8aeo3cu7dmknk0ro-nd-dft-w.jpg',
+            'https://i.postimg.cc/02mVTxZq/1040g00831btiu9dgh06g5pm8aeo3cu7dtifv5j0-nd-dft-w.jpg',
+            'https://i.postimg.cc/4xgWZMFH/1040g00831btiu9e3gs605pm8aeo3cu7drcrp8p8-nd-dft-w.jpg',
+            'https://i.postimg.cc/633RtLXv/1040g00831c6kvoh4gm6g5pm8aeo3cu7dl44a8ko-nd-dft-w.jpg',
+            'https://i.postimg.cc/pyNnfwnf/1040g2sg31btiu9b0guc05pm8aeo3cu7dslg88m8-nd-dft-w.jpg',
+            'https://i.postimg.cc/C1Q81Bh6/1040g2sg31btiu9cv0kcg5pm8aeo3cu7d0u7tpb8-nd-dft-w.jpg',
+            'https://i.postimg.cc/fyS90zkW/1040g2sg31c6kvogmgmdg5pm8aeo3cu7dc4i9cng-nd-dft-w.jpg',
+            'https://i.postimg.cc/3w3mbQf9/1040g2sg31c6kvoh40md05pm8aeo3cu7dnl9gkh8-nd-dft-w.jpg'
+        ];
 // ...紧邻 const groupChatAvatarUrl = ... 之后
 let simulatedAvatarCache = new Map(); // 全新：用于缓存模拟角色的头像
+let simulatedAlbumCache = new Map(); // ★★★ 新增：为相册创建独立的缓存 ★★★
+
 /**
  * 【辅助函数】从提供的URL数组中随机选择一个头像
  * @param {string[]} avatarUrls - 包含多个图片URL的数组
@@ -29132,7 +29146,7 @@ function closeSimulatedTranscriptModal() {
 
 // ▲▲▲ 全新JS代码粘贴结束 ▲▲▲
         /**
-         * 【全新 | V3.0 AI指令强化版】当用户点击“重新生成”时，调用AI生成模拟相册内容
+         * 【V3.1 | 支持固定随机图片】当用户点击“重新生成”时，调用AI生成模拟相册内容
          */
         async function handleGenerateSimulatedAlbum() {
             if (!activeCharacterId) return;
@@ -29144,14 +29158,15 @@ function closeSimulatedTranscriptModal() {
             }
         
             await showCustomAlert("请稍候...", `正在请求“${chat.name}”回忆TA的相册照片...`);
+            
+            simulatedAlbumCache.clear(); // ★★★ 核心修改：在生成新内容前，清空旧的图片缓存 ★★★
         
             const { proxyUrl, apiKey, model } = state.apiConfig;
             if (!proxyUrl || !apiKey || !model) {
                 alert('请先在API设置中配置好API信息。');
                 return;
             }
-        
-            // 【修复】定义一个更安全的用户显示名
+
             const userDisplayNameForAI = (state.qzoneSettings.nickname === '{{user}}' || !state.qzoneSettings.nickname) ? '用户' : state.qzoneSettings.nickname;
             
             const longTermMemoryContext = chat.longTermMemory?.map(mem => `- ${mem.content}`).join('\n') || '无';
@@ -29173,13 +29188,10 @@ function closeSimulatedTranscriptModal() {
     \`\`\`json
     [
       {
-        "description": "这是照片背后的故事或角色的心情日记，必须使用第一人称“我”来写。",
+        "description": "这是照片背后的故事或角色的心情日记，必须使用第一人称“我”来写。"
       }
     ]
     \`\`\`
-    - **【【【image_prompt 绝对禁止】】】**: 绝对禁止包含任何中文字符、句子、特殊符号、或任何可能涉及敏感（NSFW）、暴力、血腥、政治的内容！也禁止真人！
-    - **【【【image_prompt 必须是】】】**: 必须是纯英文的、用逗号分隔的【关键词组合】 (e.g., "1boy, solo, basketball jersey, in locker room, smiling, selfie")。
-    - **【【【画风指令】】】**: 在 prompt 的末尾，总是加上画风指令，例如： \`best quality, masterpiece, anime style, cinematic lighting\`
 
 # 供你参考的上下文
 - **你的角色设定**: ${chat.settings.aiPersona}
@@ -29226,9 +29238,8 @@ ${recentHistoryWithUser}
                 await showCustomAlert("生成失败", `无法生成模拟相册，请检查API配置或稍后再试。\n错误: ${error.message}`);
             }
         }
-
-        /**
-         * 【全新 | V3.0 终极防空窗版】渲染角色相册
+    /**
+         * 【V3.1 | 支持固定随机图片】渲染角色相册
          */
         async function renderCharAlbum() {
             const gridEl = document.getElementById('char-album-grid');
@@ -29242,52 +29253,19 @@ ${recentHistoryWithUser}
                 gridEl.innerHTML = '<p style="text-align:center; color: var(--text-secondary); padding: 50px 0;">TA的相册还是空的，<br>点击右上角刷新按钮生成一些照片吧！</p>';
                 return;
             }
-        
-            // 这是我们安全可靠的“备用图片”
-            const fallbackImageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent('a beautiful scenery, anime style, cinematic lighting')}`;
 
-            photos.forEach(photo => {
+            photos.forEach((photo, index) => {
                 const item = document.createElement('div');
                 item.className = 'char-photo-item';
                 item.dataset.description = photo.description;
-                // 先显示一个灰色占位背景
-                item.style.backgroundColor = '#e9ecef';
+
+                // ★★★ 核心修改：不再直接生成URL，而是调用缓存函数 ★★★
+                // 我们使用 "描述+索引" 作为每张照片的唯一ID，来从缓存中获取或分配图片
+                const photoUniqueId = `${photo.description.substring(0, 10)}_${index}`;
+                const imageUrl = getOrAssignSimulatedAvatar(photoUniqueId, albumPhotoUrls);
+                
+                item.style.backgroundImage = `url(${imageUrl})`;
                 gridEl.appendChild(item);
-
-                // ▼▼▼ 核心修复就在这里！▼▼▼
-                // 1. 使用正则表达式检查 prompt 是否包含任何非英文字符
-                const containsNonEnglish = /[^\x00-\x7F]/.test(photo.image_prompt);
-                
-                // 2. 我们的“有效性”检查现在变得更严格了：
-                //    - 必须存在
-                //    - 必须不是空字符串
-                //    - 必须不包含任何非英文字符
-                const isValidPrompt = photo.image_prompt && photo.image_prompt.trim() && !containsNonEnglish;
-                
-                // 3. 如果 prompt 有效，就使用它；否则，强制使用我们的备用 prompt
-                const finalPrompt = isValidPrompt ? photo.image_prompt : 'a beautiful scenery, anime style, cinematic lighting';
-                const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(finalPrompt)}`;
-
-                // --- 4. 这就是我们的“图片加载检查器” ---
-                const img = new Image(); // 在后台创建一个临时的<img>标签
-                
-                // a. 如果图片成功加载
-                img.onload = function() {
-                    // 就把这张成功的图片设置为背景
-                    item.style.backgroundImage = `url(${this.src})`;
-                };
-
-                // b. 如果图片加载失败（比如prompt错误，服务器返回404或损坏的图片）
-                img.onerror = function() {
-                    // 就立刻使用我们准备好的、绝对不会出错的“备用图片”
-                    console.warn('图片生成失败，已使用备用图片。失败的Prompt:', finalPrompt);
-                    item.style.backgroundImage = `url(${fallbackImageUrl})`;
-                };
-                
-                // c. 命令浏览器开始加载图片
-                img.src = imageUrl;
-                // --- 检查器工作结束 ---
-                // ▲▲▲ 修复结束 ▲▲▲
             });
         }
 // ▼▼▼ 【全新V2.0】这是AI浏览器功能的【全部核心JS代码】，请完整粘贴 ▼▼▼
