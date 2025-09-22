@@ -29293,7 +29293,8 @@ ${recentHistoryWithUser}
 // ▼▼▼ 【全新V2.0】这是AI浏览器功能的【全部核心JS代码】，请完整粘贴 ▼▼▼
 
         /**
-         * 【全新 | V2.0 AI指令强化版】当用户点击“重新生成”时，调用AI生成模拟浏览器历史
+/**
+         * 【V2.1 | 弹窗内容修复版】当用户点击“重新生成”时，调用AI生成模拟浏览器历史
          */
         async function handleGenerateBrowserHistory() {
             if (!activeCharacterId) return;
@@ -29308,7 +29309,6 @@ ${recentHistoryWithUser}
                 return;
             }
 
-            // 【修复】定义一个更安全的用户显示名
             const userDisplayNameForAI = (state.qzoneSettings.nickname === '{{user}}' || !state.qzoneSettings.nickname) ? '用户' : state.qzoneSettings.nickname;
         
             const longTermMemoryContext = chat.longTermMemory?.map(mem => `- ${mem.content}`).join('\n') || '无';
@@ -29319,6 +29319,7 @@ ${recentHistoryWithUser}
                 .map(book => `\n## 世界书《${book.name}》设定:\n${book.content.filter(e => e.enabled).map(e => `- ${e.content}`).join('\n')}`)
                 .join('');
         
+            // ▼▼▼ 核心修改在这里 ▼▼▼
             const systemPrompt = `
 # 你的任务
 你是一个虚拟生活模拟器。你的任务是扮演角色“${chat.name}”，并根据其人设、记忆和最近的互动，虚构出【5到8条】TA最近的浏览器搜索/浏览记录。
@@ -29338,7 +29339,16 @@ ${recentHistoryWithUser}
     }
     \`\`\`
 
-    
+    **格式 B：图片浏览**
+    \`\`\`json
+    {
+      "type": "image",
+      "title": "描述这张图片的【简短标题或搜索词】",
+      "url": "一个虚构的图片网站网址 (如 artstation.com/artwork/...)",
+      "description": "这是对这张图片的【完整、详细的中文内容描述】，不少于50字。这段描述将在用户点击图片时弹出。"
+    }
+    \`\`\`
+
 # 供你参考的上下文
 - **你的角色设定**: ${chat.settings.aiPersona}
 - **你的长期记忆**:
@@ -29348,6 +29358,7 @@ ${worldBookContext}
 ${recentHistoryWithUser}
 
 现在，请开始生成这组浏览记录。`;
+            // ▲▲▲ 修改结束 ▲▲▲
         
             try {
                 const messagesForApi = [{ role: 'user', content: "请根据你的设定，生成你的浏览器记录。" }];
@@ -29385,7 +29396,6 @@ ${recentHistoryWithUser}
                 await showCustomAlert("生成失败", `无法生成浏览记录，请检查API配置或稍后再试。\n错误: ${error.message}`);
             }
         }
-
 /**
  * 【全新 | V2.0 动态数据版】渲染角色的浏览器历史记录列表
  */
@@ -29434,7 +29444,7 @@ function openCharArticle(index) {
  * @param {object} articleData - 单条历史记录的数据对象
  */
 /**
-         * 【已修复弹窗功能】根据文章数据渲染文章查看页面
+         * 【V2 | 弹窗内容修复版】根据文章数据渲染文章查看页面
          * @param {object} articleData - 单条历史记录的数据对象
          */
         function renderCharArticle(articleData) {
@@ -29448,10 +29458,12 @@ function openCharArticle(index) {
                 const imageUrl = 'https://i.postimg.cc/W34P4Hjw/IMG-2018.jpg';
                 
                 // ★★★ 核心修改在这里 ★★★
-                // 1. 添加 data-description 属性来存储文字内容。
-                // 2. 添加 cursor: pointer 样式，让鼠标悬停时显示为可点击的手型。
+                // 我们现在从 articleData.description 字段读取完整的描述。
+                // 同时保留 articleData.title 作为备用，以兼容您可能已生成的旧数据。
+                const descriptionText = articleData.description || articleData.title || '无可用描述';
+
                 contentEl.innerHTML = `<img src="${imageUrl}" 
-                                            data-description="${articleData.title || '无可用描述'}" 
+                                            data-description="${descriptionText}" 
                                             style="max-width: 100%; border-radius: 8px; cursor: pointer;">`;
             } else {
                 contentEl.innerHTML = `<p>${(articleData.content || '内容加载失败...').replace(/\n/g, '</p><p>')}</p>`;
