@@ -10860,7 +10860,8 @@ const privateChatAvatarUrls = [
 ];
 
 const groupChatAvatarUrl = 'https://i.postimg.cc/k5xrJ1qQ/IMG-2020.jpg';
-
+// ...紧邻 const groupChatAvatarUrl = ... 之后
+let simulatedAvatarCache = new Map(); // 全新：用于缓存模拟角色的头像
 /**
  * 【辅助函数】从提供的URL数组中随机选择一个头像
  * @param {string[]} avatarUrls - 包含多个图片URL的数组
@@ -10873,6 +10874,24 @@ function getRandomAvatar(avatarUrls) {
     const randomIndex = Math.floor(Math.random() * avatarUrls.length);
     return avatarUrls[randomIndex];
 }
+        /**
+         * 【全新】获取或为一个模拟角色随机分配一个固定的头像
+         * @param {string} participantName - 模拟角色的名字
+         * @param {string[]} avatarUrls - 可供选择的头像URL数组
+         * @returns {string} - 为该角色确定的头像URL
+         */
+        function getOrAssignSimulatedAvatar(participantName, avatarUrls) {
+            // 检查“记忆”里是否已有该角色的头像
+            if (simulatedAvatarCache.has(participantName)) {
+                return simulatedAvatarCache.get(participantName); // 如果有，直接返回
+            } else {
+                // 如果没有，就随机分配一个新头像
+                const randomAvatar = getRandomAvatar(avatarUrls);
+                // 将新头像存入“记忆”
+                simulatedAvatarCache.set(participantName, randomAvatar);
+                return randomAvatar;
+            }
+        }
             document.addEventListener('DOMContentLoaded', () => {
         
                 // ===================================================================
@@ -28857,7 +28876,8 @@ async function renderCharSimulatedQQ() {
                     avatarUrl = groupChatAvatarUrl; // 使用固定的群聊头像
                 } else { 
                     displayName = convo.participant.name;
-                    avatarUrl = getRandomAvatar(privateChatAvatarUrls); // 从您的列表中随机选择私聊头像
+                   // 调用新的“获取或分配”函数
+                    avatarUrl = getOrAssignSimulatedAvatar(convo.participant.name, privateChatAvatarUrls);
                 }
                 // --- ★★★ 修改结束 ★★★ ---
         item.innerHTML = `
@@ -28890,7 +28910,8 @@ async function renderCharSimulatedQQ() {
             }
         
             await showCustomAlert("请稍候...", `正在根据“${chat.name}”的记忆和人设，生成最近的社交动态...`);
-        
+        simulatedAvatarCache.clear(); // ★★★ 在这里添加这行代码，清空旧的头像记忆 ★★★
+ 
             const { proxyUrl, apiKey, model } = state.apiConfig;
             if (!proxyUrl || !apiKey || !model) {
                 alert('请先在API设置中配置好API信息。');
@@ -29037,22 +29058,22 @@ async function openCharSimulatedConversation(conversationIndex) {
 
     const participantMap = new Map();
 
-   // --- ★★★ 核心修改就在这里 ★★★ ---
+  // --- ★★★ 核心修改就在这里 ★★★ ---
             if (conversation.type === 'group') {
                 titleEl.textContent = `${conversation.groupName} (${conversation.participants.length + 1})`;
                 inputEl.placeholder = `在 ${conversation.groupName} 中聊天`;
                 
-                // 群聊中的NPC成员，使用随机私聊头像
+                // 群聊中的NPC成员，使用“获取或分配”函数
                 conversation.participants.forEach(p => {
-                    participantMap.set(p.name, getRandomAvatar(privateChatAvatarUrls));
+                    participantMap.set(p.name, getOrAssignSimulatedAvatar(p.name, privateChatAvatarUrls));
                 });
                 
             } else { // 私聊逻辑
                 titleEl.textContent = conversation.participant.name;
                 inputEl.placeholder = `与 ${conversation.participant.name} 的对话`;
                 
-                // 私聊NPC使用随机私聊头像
-                const npcAvatarUrl = getRandomAvatar(privateChatAvatarUrls);
+                // 私聊NPC同样使用“获取或分配”函数
+                const npcAvatarUrl = getOrAssignSimulatedAvatar(conversation.participant.name, privateChatAvatarUrls);
                 participantMap.set(conversation.participant.name, npcAvatarUrl);
             }
             
