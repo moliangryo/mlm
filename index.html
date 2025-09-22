@@ -12377,7 +12377,7 @@ commentActions.forEach(action => {
                 if (targetPost.type === 'shuoshuo') {
                     innerContentHtml = `<div class="post-content" style="margin-bottom: 10px;">${parseMarkdown(targetPost.content).replace(/\n/g, '<br>')}</div>`;
                 } else if (targetPost.type === 'image_post' && targetPost.imageUrl) {
-                        cconst postImageUrl = targetPost.imageUrl || 'https://i.postimg.cc/W34P4Hjw/IMG-2018.jpg'; // <-- 修改在这里
+                        const postImageUrl = targetPost.imageUrl || 'https://i.postimg.cc/W34P4Hjw/IMG-2018.jpg'; // <-- 修改在这里
     innerContentHtml = publicTextHtml ? `${publicTextHtml}<div style="margin-top:10px;"><img src="${postImageUrl}" class="chat-image"></div>` : `<img src="${postImageUrl}" class="chat-image">`;
 } else if (targetPost.type === 'text_image') {
     const postImageUrl = 'https://i.postimg.cc/W34P4Hjw/IMG-2018.jpg'; // <-- 修
@@ -12879,12 +12879,13 @@ commentActions.forEach(action => {
                     if (post.type === 'shuoshuo') {
                         contentHtml = `<div class="post-content">${post.content.replace(/\n/g, '<br>')}</div>`;
                     } else if (post.type === 'image_post' && post.imageUrl) {
-    const postImageUrl = post.image_prompt ? `https://image.pollinations.ai/prompt/${post.image_prompt}` : (post.imageUrl || 'https://i.postimg.cc/KYr2qRCK/1.jpg');
-    contentHtml = publicTextHtml ? `${publicTextHtml}<div style="margin-top:10px;"><img src="${postImageUrl}" class="chat-image"></div>` : `<img src="${postImageUrl}" class="chat-image">`;
+    const postImageUrl = post.image_prompt ? `https://image.pollinations.ai/prompt/${post.image_prompt}` : (post.imageUrl || 'https://i.postimg.cc/W34P4Hjw/IMG-2018.jpg'); // 修正1: cconst -> const
+    innerContentHtml = publicTextHtml ? `${publicTextHtml}<div style="margin-top:10px;"><img src="${postImageUrl}" class="chat-image"></div>` : `<img src="${postImageUrl}" class="chat-image">`;
 } else if (post.type === 'text_image') {
-    const postImageUrl = post.image_prompt ? `https://image.pollinations.ai/prompt/${post.image_prompt}` : 'https://i.postimg.cc/KYr2qRCK/1.jpg';
-    contentHtml = publicTextHtml ? `${publicTextHtml}<div style="margin-top:10px;"><img src="${postImageUrl}" class="chat-image" style="cursor: pointer;" data-hidden-text="${post.hiddenContent}"></div>` : `<img src="${postImageUrl}" class="chat-image" style="cursor: pointer;" data-hidden-text="${post.hiddenContent}">`;
-                    }
+    const postImageUrl = post.image_prompt ? `https://image.pollinations.ai/prompt/${post.image_prompt}` : 'https://i.postimg.cc/W34P4Hjw/IMG-2018.jpg'; // 修正2: 移除多余的 const 定义
+    innerContentHtml = publicTextHtml ? `${publicTextHtml}<div style="margin-top:10px;"><img src="${postImageUrl}" class="chat-image" style="cursor: pointer;" data-hidden-text="${targetPost.hiddenContent}"></div>` : `<img src="${postImageUrl}" class="chat-image" style="cursor: pointer;" data-hidden-text="${targetPost.hiddenContent}">`;
+}
+                    
         
                     // ▼▼▼ 新增/修改的代码开始 ▼▼▼
                     
@@ -30421,6 +30422,8 @@ window.openCharacterSelector = openCharacterSelector;
 window.openCharApp = openCharApp;
 window.switchToMyPhone = switchToMyPhone;
 window.switchToCharHomeScreen = switchToCharHomeScreen;
+window.handleListenTogetherClick = handleListenTogetherClick; // <-- 只需要新增这一行
+
 // ▲▲▲ 修复结束 ▲▲▲
         
                     await loadAllDataFromDB();
