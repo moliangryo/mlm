@@ -10875,7 +10875,23 @@ const groupChatAvatarUrl = 'https://i.postimg.cc/k5xrJ1qQ/IMG-2020.jpg';
 // ...紧邻 const groupChatAvatarUrl = ... 之后
 let simulatedAvatarCache = new Map(); // 全新：用于缓存模拟角色的头像
 let simulatedAlbumCache = new Map(); // ★★★ 新增：为相册创建独立的缓存 ★★★
+let shuffledAlbumUrls = []; // ★★★ 新增：用于存放洗牌后的URL顺序 ★★★
 
+        /**
+         * 【全新】洗牌函数 (Fisher-Yates Shuffle)
+         * @param {Array} array - 需要被打乱的数组
+         * @returns {Array} - 返回一个被打乱顺序的新数组
+         */
+        function shuffleArray(array) {
+            let currentIndex = array.length, randomIndex;
+            const newArray = [...array]; // 创建一个副本，不修改原始数组
+            while (currentIndex !== 0) {
+                randomIndex = Math.floor(Math.random() * currentIndex);
+                currentIndex--;
+                [newArray[currentIndex], newArray[randomIndex]] = [newArray[randomIndex], newArray[currentIndex]];
+            }
+            return newArray;
+        }
 /**
  * 【辅助函数】从提供的URL数组中随机选择一个头像
  * @param {string[]} avatarUrls - 包含多个图片URL的数组
@@ -29145,8 +29161,8 @@ function closeSimulatedTranscriptModal() {
 }
 
 // ▲▲▲ 全新JS代码粘贴结束 ▲▲▲
-        /**
-         * 【V3.1 | 支持固定随机图片】当用户点击“重新生成”时，调用AI生成模拟相册内容
+       /**
+         * 【V3.2 | 洗牌版】当用户点击“重新生成”时，调用AI生成模拟相册内容
          */
         async function handleGenerateSimulatedAlbum() {
             if (!activeCharacterId) return;
@@ -29159,7 +29175,8 @@ function closeSimulatedTranscriptModal() {
         
             await showCustomAlert("请稍候...", `正在请求“${chat.name}”回忆TA的相册照片...`);
             
-            simulatedAlbumCache.clear(); // ★★★ 核心修改：在生成新内容前，清空旧的图片缓存 ★★★
+            // ★★★ 核心修改：在这里立刻进行洗牌 ★★★
+            shuffledAlbumUrls = shuffleArray(albumPhotoUrls);
         
             const { proxyUrl, apiKey, model } = state.apiConfig;
             if (!proxyUrl || !apiKey || !model) {
@@ -29169,6 +29186,7 @@ function closeSimulatedTranscriptModal() {
 
             const userDisplayNameForAI = (state.qzoneSettings.nickname === '{{user}}' || !state.qzoneSettings.nickname) ? '用户' : state.qzoneSettings.nickname;
             
+            // ... (函数后面的API请求和systemPrompt部分保持完全不变)
             const longTermMemoryContext = chat.longTermMemory?.map(mem => `- ${mem.content}`).join('\n') || '无';
             const recentHistoryWithUser = chat.history.slice(-5).map(msg => `${msg.role === 'user' ? userDisplayNameForAI : chat.name}: ${String(msg.content).substring(0, 30)}...`).join('\n');
             const worldBookContext = (chat.settings.linkedWorldBookIds || [])
@@ -29179,7 +29197,7 @@ function closeSimulatedTranscriptModal() {
         
             const systemPrompt = `
 # 你的任务
-你是一个虚拟生活模拟器。你的任务是扮演角色“${chat.name}”，并根据其人设、记忆和最近的互动，构思出【8到10张】TA最近可能会拍摄或珍藏在手机相册里的照片。
+你是一个虚拟生活模拟器。你的任务是扮演角色“${chat.name}”，并根据其人设、记忆和最近的互动，构思出【9张】TA最近可能会拍摄或珍藏在手机相册里的照片。
 
 # 核心规则
 1.  **创造性与合理性**: 照片内容必须完全符合角色的性格、爱好、职业和生活环境。
@@ -29253,16 +29271,15 @@ ${recentHistoryWithUser}
                 gridEl.innerHTML = '<p style="text-align:center; color: var(--text-secondary); padding: 50px 0;">TA的相册还是空的，<br>点击右上角刷新按钮生成一些照片吧！</p>';
                 return;
             }
-
+ // ★★★ 核心修改在这里 ★★★
             photos.forEach((photo, index) => {
                 const item = document.createElement('div');
                 item.className = 'char-photo-item';
                 item.dataset.description = photo.description;
 
-                // ★★★ 核心修改：不再直接生成URL，而是调用缓存函数 ★★★
-                // 我们使用 "描述+索引" 作为每张照片的唯一ID，来从缓存中获取或分配图片
-                const photoUniqueId = `${photo.description.substring(0, 10)}_${index}`;
-                const imageUrl = getOrAssignSimulatedAvatar(photoUniqueId, albumPhotoUrls);
+                // 按顺序从洗牌后的数组中取出URL
+                // a % b (取模)运算可以确保即使AI生成的照片数量与URL数量不符，也能安全地循环使用URL
+                const imageUrl = shuffledAlbumUrls[index % shuffledAlbumUrls.length];
                 
                 item.style.backgroundImage = `url(${imageUrl})`;
                 gridEl.appendChild(item);
