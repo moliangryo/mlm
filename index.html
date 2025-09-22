@@ -10826,6 +10826,53 @@ function toGeminiRequestData(model, apiKey, systemInstruction, messagesForDecisi
     };
 }
 // ▲▲▲ 替换结束 ▲▲▲
+        // ===================================================================
+// --- 【全新】角色手机头像URL配置 ---
+// ===================================================================
+
+const privateChatAvatarUrls = [
+    'https://i.postimg.cc/gk6Z28Lz/1040g00831fbv118jmo605pr6tjcm3h30qbtncfo-nd-dft-w.jpg',
+    'https://i.postimg.cc/hGGxgw9w/1040g00831440ih57i6005nbe698g8v4f1bhid30-nd-dft-w.jpg',
+    'https://i.postimg.cc/rwjWBctx/1040g00831440ih57i60g5nbe698g8v4fob23b08-nd-dft-w.jpg',
+    'https://i.postimg.cc/fRzSjFgL/1040g00831fbv110lme5g5pr6tjcm3h30sdu9odg-nd-dft-w.jpg',
+    'https://i.postimg.cc/bwpkVddq/1040g00831fbv112r6e6g5pr6tjcm3h30g6usj3o-nd-dft-w.jpg',
+    'https://i.postimg.cc/fTh9kkcY/1040g00831fbv112s6ahg5pr6tjcm3h303fdt6r8-nd-dft-w.jpg',
+    'https://i.postimg.cc/85J6f6Xm/1040g00831fbv11bsn46g5pr6tjcm3h30und2ip0-nd-dft-w.jpg',
+    'https://i.postimg.cc/hjk7LtHW/1040g00831fbv11cf6o6g5pr6tjcm3h3076ju4r8-nd-dft-w.jpg',
+    'https://i.postimg.cc/fyYSBhN3/1040g00831fbv11dpma6g5pr6tjcm3h30nvns2ag-nd-dft-w.jpg',
+    'https://i.postimg.cc/y6RRV0ZV/1040g00831fbv11h5n45g5pr6tjcm3h30s8t77lo-nd-dft-w.jpg',
+    'https://i.postimg.cc/VLjXFXf7/1040g2sg3143irp6o18705nbe698g8v4fob7j3b0-nd-dft-w.jpg',
+    'https://i.postimg.cc/44Y5pKHM/1040g2sg3143irp6o187g5nbe698g8v4flt4dam8-nd-dft-w.jpg',
+    'https://i.postimg.cc/FscVn2ZV/1040g2sg3144s9mmbh8005nbe698g8v4fdl4nff0-nd-dft-w.jpg',
+    'https://i.postimg.cc/05hCn8pN/1040g2sg3144s9mmbh80g5nbe698g8v4fgais918-nd-dft-w.jpg',
+    'https://i.postimg.cc/zGrFm02Z/1040g2sg3146cp9a3260g5nbe698g8v4f79nhelo-nd-dft-w.jpg',
+    'https://i.postimg.cc/t4Nt9W81/1040g2sg3146cp9a326105nbe698g8v4fcgdb40g-nd-dft-w.jpg',
+    'https://i.postimg.cc/xjNvcWWV/1040g2sg314inqrsbmg705paqv0ogle72dbgjqjg-nd-dft-w.jpg',
+    'https://i.postimg.cc/Kzwt0N3W/1040g2sg314inqrsbmg7g5paqv0ogle727tv8lcg-nd-dft-w.jpg',
+    'https://i.postimg.cc/pXND8sHh/1040g2sg314inqrsbmg805paqv0ogle72dutnpco-nd-dft-w.jpg',
+    'https://i.postimg.cc/yxRctZF8/1040g2sg314inqrsbmg8g5paqv0ogle72u6qhv68-nd-dft-w.jpg',
+    'https://i.postimg.cc/pd0fFxWR/1040g2sg31fbv112q74d05pr6tjcm3h30im44ito-nd-dft-w.jpg',
+    'https://i.postimg.cc/nM8MDS9H/1040g2sg31fbv115rn4d05pr6tjcm3h302s0p4r0-nd-dft-w.jpg',
+    'https://i.postimg.cc/ydkFh5x9/1040g2sg31fbv119r6i6g5pr6tjcm3h30qg6368o-nd-dft-w.jpg',
+    'https://i.postimg.cc/k5MNGDdT/1040g2sg31fbv11ahmed05pr6tjcm3h30mfo2kb0-nd-dft-w.jpg',
+    'https://i.postimg.cc/5tkzt3gt/1040g2sg31fbv11g26od05pr6tjcm3h30quc67jo-nd-dft-w.jpg',
+    'https://i.postimg.cc/hPb7mgs6/1040g2sg31fbv11i7746g5pr6tjcm3h30elur3g8-nd-dft-w.jpg'
+];
+
+const groupChatAvatarUrl = 'https://i.postimg.cc/k5xrJ1qQ/IMG-2020.jpg';
+
+/**
+ * 【辅助函数】从提供的URL数组中随机选择一个头像
+ * @param {string[]} avatarUrls - 包含多个图片URL的数组
+ * @returns {string} - 随机选中的一个URL
+ */
+function getRandomAvatar(avatarUrls) {
+    if (!avatarUrls || avatarUrls.length === 0) {
+        return 'https://i.postimg.cc/W34P4Hjw/IMG-2018.jpg'; // 备用
+    }
+    const randomIndex = Math.floor(Math.random() * avatarUrls.length);
+    return avatarUrls[randomIndex];
+}
             document.addEventListener('DOMContentLoaded', () => {
         
                 // ===================================================================
@@ -12330,10 +12377,10 @@ commentActions.forEach(action => {
                 if (targetPost.type === 'shuoshuo') {
                     innerContentHtml = `<div class="post-content" style="margin-bottom: 10px;">${parseMarkdown(targetPost.content).replace(/\n/g, '<br>')}</div>`;
                 } else if (targetPost.type === 'image_post' && targetPost.imageUrl) {
-                        const postImageUrl = targetPost.image_prompt ? `https://image.pollinations.ai/prompt/${targetPost.image_prompt}` : (targetPost.imageUrl || 'https://i.postimg.cc/KYr2qRCK/1.jpg');
+                        cconst postImageUrl = targetPost.imageUrl || 'https://i.postimg.cc/W34P4Hjw/IMG-2018.jpg'; // <-- 修改在这里
     innerContentHtml = publicTextHtml ? `${publicTextHtml}<div style="margin-top:10px;"><img src="${postImageUrl}" class="chat-image"></div>` : `<img src="${postImageUrl}" class="chat-image">`;
 } else if (targetPost.type === 'text_image') {
-    const postImageUrl = targetPost.image_prompt ? `https://image.pollinations.ai/prompt/${targetPost.image_prompt}` : 'https://i.postimg.cc/KYr2qRCK/1.jpg';
+    const postImageUrl = 'https://i.postimg.cc/W34P4Hjw/IMG-2018.jpg'; // <-- 修
     innerContentHtml = publicTextHtml ? `${publicTextHtml}<div style="margin-top:10px;"><img src="${postImageUrl}" class="chat-image" style="cursor: pointer;" data-hidden-text="${targetPost.hiddenContent}"></div>` : `<img src="${postImageUrl}" class="chat-image" style="cursor: pointer;" data-hidden-text="${targetPost.hiddenContent}">`;
                 }
                 return innerContentHtml;
@@ -14912,7 +14959,7 @@ if (!state.globalSettings.widgetData) {
                 } else if (msg.type === 'user_photo' || msg.type === 'ai_image') {
     bubble.classList.add('is-ai-image', 'is-card-like');
     const altText = msg.type === 'user_photo' ? "用户描述的照片" : "AI生成的图片";
-    const imageUrl = msg.image_prompt ? `https://image.pollinations.ai/prompt/${msg.image_prompt}` : 'https://i.postimg.cc/KYr2qRCK/1.jpg';
+    const imageUrl = 'https://i.postimg.cc/W34P4Hjw/IMG-2018.jpg'; // <-- 修改在这里
     contentHtml = `<img src="${imageUrl}" class="ai-generated-image" alt="${altText}" data-description="${msg.content}">`;
                 } else if (msg.type === 'voice_message') {
                     bubble.classList.add('is-voice-message', 'is-card-like');
@@ -18302,9 +18349,7 @@ ${longTermMemoryContext}
         -   **发消息+更新状态**: '[{"type": "update_status", "status_text": "正在做的事", "is_busy": true}, {"type": "text", "content": "你想对用户说的话..."}]'
         -   **发说说 (原创内容)**: '[{"type": "qzone_post", "postType": "shuoshuo", "content": "动态的文字内容..."}]'
         -   **【【【重要：转发动态】】】**: **严禁**自己拼接"//转发"文字！你【必须】使用此专用指令来转发：'[{"type": "repost", "postId": (要转发的动态ID), "comment": "你的转发评论..."}]'
-        
--   **发布文字图**: '[{"type": "qzone_post", "postType": "text_image", "publicText": "(可选)动态的公开文字", "hiddenContent": "对于图片的具体【中文】描述...", "image_prompt": "图片的【英文】关键词, 用%20分隔, 风格只能为风景/动漫/插画/二次元等, 禁止生成真人"}]'
-        -   **【【【评论动态的四种方式】】】**:
+           -   **【【【评论动态的四种方式】】】**:
             -   **方式1 (单条文字)**: '[{"type": "qzone_comment", "name": "角色本名", "postId": 123, "commentText": "这太有趣了！"}]'
             -   **方式2 (多条文字)**: '[{"type": "qzone_comment", "name": "角色本名", "postId": 123, "comments": ["哇！", "这是什么？", "看起来好棒！"]}]'
             -   **方式3 (表情)**: '[{"type": "qzone_comment", "name": "角色本名", "postId": 456, "stickerUrl": "https://...表情URL...", "stickerMeaning": "这个表情的意思，比如'开心'"}]'
@@ -28214,28 +28259,7 @@ window.switchToCharScreen = switchToCharScreen;
 
                 // ▼▼▼ 核心修复就在这里！这是最终的、最强的防御逻辑 ▼▼▼
                 
-                let finalPrompt;
-                
-                // 1. 我们首先检查 photo.image_prompt 这个字段是否存在，并且是一个非空的字符串
-                if (photo.image_prompt && typeof photo.image_prompt === 'string' && photo.image_prompt.trim()) {
-                    // 2. 如果存在，我们再检查它是否包含任何非英文字符
-                    const containsNonEnglish = /[^\x00-\x7F]/.test(photo.image_prompt);
-                    
-                    // 3. 只有当它不包含非英文字符时，我们才认为它是有效的
-                    if (!containsNonEnglish) {
-                        finalPrompt = photo.image_prompt;
-                    } else {
-                        // 如果包含中文，就记录一个警告，并准备使用备用指令
-                        console.warn('检测到无效的中文指令，已强制使用备用图片:', photo.image_prompt);
-                        finalPrompt = 'a beautiful scenery, anime style, cinematic lighting';
-                    }
-                } else {
-                    // 4. 如果 image_prompt 字段根本不存在，或者为空，我们直接使用备用指令
-                    console.warn('检测到缺失的 image_prompt，已强制使用备用图片。');
-                    finalPrompt = 'a beautiful scenery, anime style, cinematic lighting';
-                }
-                
-                const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(finalPrompt)}`;
+                const imageUrl = 'https://i.postimg.cc/W34P4Hjw/IMG-2018.jpg';
 
                 // --- 5. 图片加载检查器 (保持不变，作为第二层保险) ---
                 const img = new Image();
@@ -28826,28 +28850,15 @@ async function renderCharSimulatedQQ() {
         let avatarUrl, displayName;
 
         // ▼▼▼ 核心修改就在这里！ ▼▼▼
-        if (convo.type === 'group') {
-            displayName = convo.groupName;
-            
-            // 1. 我们不再只用群名，而是构造一个更丰富的英文指令
-            //    - "logo": 告诉AI我们想要一个图标
-            //    - "simple, flat design": 要求设计简洁、扁平化，更像App图标
-            //    - convo.groupName: 将群名作为核心主题
-            const groupAvatarPrompt = `logo, simple, flat design, for a group chat named '${convo.groupName}'`;
-            
-            // 2. 将这个更具体的指令发送给AI绘画引擎
-            avatarUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(groupAvatarPrompt)}`;
-            
-            // (这段添加“群”标签的逻辑保持不变)
-            displayName += ` <span class="group-tag">群</span>`;
-
-        } else { // 私聊的逻辑保持不变
-            displayName = convo.participant.name;
-            const npcAvatarPrompt = convo.participant.avatar_prompt || 'anime person';
-            avatarUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(npcAvatarPrompt)}`;
-        }
-        // ▲▲▲ 修改结束 ▲▲▲
-
+        // --- ★★★ 核心修改就在这里 ★★★ ---
+                if (convo.type === 'group') {
+                    displayName = convo.groupName + ` <span class="group-tag">群</span>`;
+                    avatarUrl = groupChatAvatarUrl; // 使用固定的群聊头像
+                } else { 
+                    displayName = convo.participant.name;
+                    avatarUrl = getRandomAvatar(privateChatAvatarUrls); // 从您的列表中随机选择私聊头像
+                }
+                // --- ★★★ 修改结束 ★★★ ---
         item.innerHTML = `
             <div class="avatar-group">
                  <img src="${avatarUrl}" class="avatar" style="border-radius: 50%;">
@@ -28931,8 +28942,8 @@ async function renderCharSimulatedQQ() {
       "type": "private",
       "participant": {
         "name": "NPC的名字",
-        "avatar_prompt": "一段用于生成头像的【英文】关键词, 风格为动漫/插画/二次元等, 禁止真人"
-      },
+             
+    },
       "messages": [
         { "sender": "${characterOriginalName}", "content": "对话内容1" },
         { "sender": "NPC的名字", "content": "对话内容2" }
@@ -28946,8 +28957,8 @@ async function renderCharSimulatedQQ() {
       "type": "group",
       "groupName": "世界书中提到的或你虚构的群名",
       "participants": [
-        { "name": "NPC成员1", "avatar_prompt": "成员1的头像【英文】关键词" },
-        { "name": "NPC成员2", "avatar_prompt": "成员2的头像【英文】关键词" }
+        { "name": "NPC成员1" },
+        { "name": "NPC成员2" }
       ],
       "messages": [
         { "sender": "${characterOriginalName}", "content": "我在群里说的话" },
@@ -29025,52 +29036,50 @@ async function openCharSimulatedConversation(conversationIndex) {
 
     const participantMap = new Map();
 
-    // ▼▼▼ 核心修改就在这里！▼▼▼
-    // 我们现在统一使用 participantMap 来处理所有头像，不再区分私聊和群聊
-
-    if (conversation.type === 'group') {
-        titleEl.textContent = `${conversation.groupName} (${conversation.participants.length + 1})`;
-        inputEl.placeholder = `在 ${conversation.groupName} 中聊天`;
-        
-        conversation.participants.forEach(p => {
-            participantMap.set(p.name, `https://image.pollinations.ai/prompt/${encodeURIComponent(p.avatar_prompt || 'anime person')}`);
-        });
-        
-    } else { // 私聊逻辑
-        titleEl.textContent = conversation.participant.name;
-        inputEl.placeholder = `与 ${conversation.participant.name} 的对话`;
-        
-        // 【关键修复】为私聊也添加头像到 participantMap 中
-        const npcAvatarUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(conversation.participant.avatar_prompt || 'anime person')}`;
-        participantMap.set(conversation.participant.name, npcAvatarUrl);
-    }
-    
-    // 无论私聊还是群聊，都把主角自己的信息也存入Map
-    participantMap.set(mainChar.originalName || mainChar.name, mainChar.settings.aiAvatar);
-    
-    const tempChatObjectForRendering = {
-        id: 'temp_simulated_chat',
-        isGroup: conversation.type === 'group',
-        name: conversation.groupName || conversation.participant.name,
-        originalName: mainChar.originalName,
-        members: conversation.participants ? conversation.participants.map(p => ({
-            originalName: p.name,
-            groupNickname: p.name,
-            avatar: participantMap.get(p.name) || defaultGroupMemberAvatar
-        })) : [],
-        settings: {
-            theme: mainChar.settings.theme,
-            fontSize: mainChar.settings.fontSize,
-            customCss: mainChar.settings.customCss,
-            myNickname: mainChar.name,
-            myAvatar: mainChar.settings.aiAvatar,
-            // 【关键修复】对于私聊，我们也从 map 中获取aiAvatar
-            aiAvatar: conversation.participant ? participantMap.get(conversation.participant.name) : '',
-            myAvatarFrame: mainChar.settings.aiAvatarFrame,
-            aiAvatarFrame: ''
-        }
-    };
-    // ▲▲▲ 修改结束 ▲▲▲
+   // --- ★★★ 核心修改就在这里 ★★★ ---
+            if (conversation.type === 'group') {
+                titleEl.textContent = `${conversation.groupName} (${conversation.participants.length + 1})`;
+                inputEl.placeholder = `在 ${conversation.groupName} 中聊天`;
+                
+                // 群聊中的NPC成员，使用随机私聊头像
+                conversation.participants.forEach(p => {
+                    participantMap.set(p.name, getRandomAvatar(privateChatAvatarUrls));
+                });
+                
+            } else { // 私聊逻辑
+                titleEl.textContent = conversation.participant.name;
+                inputEl.placeholder = `与 ${conversation.participant.name} 的对话`;
+                
+                // 私聊NPC使用随机私聊头像
+                const npcAvatarUrl = getRandomAvatar(privateChatAvatarUrls);
+                participantMap.set(conversation.participant.name, npcAvatarUrl);
+            }
+            
+            // 无论私聊还是群聊，都把主角自己的信息也存入Map
+            participantMap.set(mainChar.originalName || mainChar.name, mainChar.settings.aiAvatar);
+            
+            const tempChatObjectForRendering = {
+                id: 'temp_simulated_chat',
+                isGroup: conversation.type === 'group',
+                name: conversation.groupName || conversation.participant.name,
+                originalName: mainChar.originalName,
+                members: conversation.participants ? conversation.participants.map(p => ({
+                    originalName: p.name,
+                    groupNickname: p.name,
+                    avatar: participantMap.get(p.name) || defaultGroupMemberAvatar
+                })) : [],
+                settings: {
+                    theme: mainChar.settings.theme,
+                    fontSize: mainChar.settings.fontSize,
+                    customCss: mainChar.settings.customCss,
+                    myNickname: mainChar.name,
+                    myAvatar: mainChar.settings.aiAvatar,
+                    aiAvatar: conversation.participant ? participantMap.get(conversation.participant.name) : '',
+                    myAvatarFrame: mainChar.settings.aiAvatarFrame,
+                    aiAvatarFrame: ''
+                }
+            };
+            // --- ★★★ 修改结束 ★★★ ---
     
     for (const msg of conversation.messages) {
         const isFromMainChar = msg.sender === (mainChar.originalName || mainChar.name);
@@ -29143,7 +29152,6 @@ function closeSimulatedTranscriptModal() {
     [
       {
         "description": "这是照片背后的故事或角色的心情日记，必须使用第一人称“我”来写。",
-        "image_prompt": "一段用于生成这张照片的、详细的【英文】关键词。"
       }
     ]
     \`\`\`
@@ -29308,16 +29316,7 @@ ${recentHistoryWithUser}
     }
     \`\`\`
 
-    **格式 B：图片生成**
-    \`\`\`json
-    {
-      "type": "image",
-      "title": "描述这张图片的标题或搜索词",
-      "url": "一个虚构的图片网站网址 (如 artstation.com/artwork/...")",
-      "image_prompt": "一段用于生成这张图片的、详细的【英文】关键词, 风格为动漫/插画/二次元等, 禁止真人"
-    }
-    \`\`\`
-
+    
 # 供你参考的上下文
 - **你的角色设定**: ${chat.settings.aiPersona}
 - **你的长期记忆**:
@@ -29419,9 +29418,9 @@ function renderCharArticle(articleData) {
     titleEl.textContent = articleData.title;
     contentEl.innerHTML = ''; // 清空旧内容
 
-    if (articleData.type === 'image' && articleData.image_prompt) {
-        // 如果是图片类型，创建一个img标签并使用AI绘画URL
-        const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(articleData.image_prompt)}`;
+    if (articleData.type === 'image' ) {
+        // 如果是图片类型，创建一个img标签并使用固定的占位图
+        const imageUrl = 'https://i.postimg.cc/W34P4Hjw/IMG-2018.jpg'; // <-- 修改在这里
         contentEl.innerHTML = `<img src="${imageUrl}" style="max-width: 100%; border-radius: 8px;">`;
     } else {
         // 如果是文本类型，直接显示内容，并处理换行
@@ -29874,7 +29873,7 @@ function renderCharAmap() {
 你是一个虚拟生活模拟器。你的任务是扮演角色“${chat.name}”，并根据其人设、记忆和最近的互动，虚构出TA最近一天的【手机App屏幕使用时间】记录，总共约20条。
 
 # 核心规则
-1.  **创造性与多样性**: 生成的App列表【不必局限于】角色手机主屏幕上已有的App。你可以自由地虚构TA可能使用的其他App，例如 Instagram, Twitter, 各种游戏 (如：原神, 王者荣耀), 视频App (如：抖音, YouTube), 学习或工作软件等，这能更好地体现角色的隐藏兴趣和生活习惯。
+1.  **创造性与多样性**: 生成的App列表【不必局限于】角色手机主屏幕上已有的App。你可以自由地虚构TA可能使用的其他App，例如 Instagram, Twitter, 各种游戏 (如：王者荣耀), 视频App (如：抖音, YouTube), 学习或工作软件等，这能更好地体现角色的隐藏兴趣和生活习惯。
 2.  **合理性**: 使用时长和App类型必须完全符合角色的性格、爱好、职业和生活环境。
 3.  **格式铁律 (最高优先级)**: 你的回复【必须且只能】是一个JSON数组。数组中的每个元素都是一个对象，代表一个App的使用记录，格式【必须】如下:
     \`\`\`json
