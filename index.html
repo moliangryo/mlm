@@ -29412,22 +29412,30 @@ function openCharArticle(index) {
  * 【全新】根据文章数据渲染文章查看页面
  * @param {object} articleData - 单条历史记录的数据对象
  */
-function renderCharArticle(articleData) {
-    const titleEl = document.getElementById('char-article-title');
-    const contentEl = document.getElementById('char-article-content');
-    
-    titleEl.textContent = articleData.title;
-    contentEl.innerHTML = ''; // 清空旧内容
+/**
+         * 【已修复弹窗功能】根据文章数据渲染文章查看页面
+         * @param {object} articleData - 单条历史记录的数据对象
+         */
+        function renderCharArticle(articleData) {
+            const titleEl = document.getElementById('char-article-title');
+            const contentEl = document.getElementById('char-article-content');
+            
+            titleEl.textContent = articleData.title;
+            contentEl.innerHTML = ''; 
 
-    if (articleData.type === 'image' ) {
-        // 如果是图片类型，创建一个img标签并使用固定的占位图
-        const imageUrl = 'https://i.postimg.cc/W34P4Hjw/IMG-2018.jpg'; // <-- 修改在这里
-        contentEl.innerHTML = `<img src="${imageUrl}" style="max-width: 100%; border-radius: 8px;">`;
-    } else {
-        // 如果是文本类型，直接显示内容，并处理换行
-        contentEl.innerHTML = `<p>${(articleData.content || '内容加载失败...').replace(/\n/g, '</p><p>')}</p>`;
-    }
-}
+            if (articleData.type === 'image') {
+                const imageUrl = 'https://i.postimg.cc/W34P4Hjw/IMG-2018.jpg';
+                
+                // ★★★ 核心修改在这里 ★★★
+                // 1. 添加 data-description 属性来存储文字内容。
+                // 2. 添加 cursor: pointer 样式，让鼠标悬停时显示为可点击的手型。
+                contentEl.innerHTML = `<img src="${imageUrl}" 
+                                            data-description="${articleData.title || '无可用描述'}" 
+                                            style="max-width: 100%; border-radius: 8px; cursor: pointer;">`;
+            } else {
+                contentEl.innerHTML = `<p>${(articleData.content || '内容加载失败...').replace(/\n/g, '</p><p>')}</p>`;
+            }
+        }
 
 // ▲▲▲ 全新JS代码粘贴结束 ▲▲▲
         /**
@@ -30319,7 +30327,16 @@ function changeCharPlayMode() {
     charPlayerState.playMode = modes[(currentModeIndex + 1) % modes.length];
     document.getElementById('char-music-mode-btn').textContent = {'order': '顺序', 'random': '随机', 'single': '单曲'}[charPlayerState.playMode];
 }
-
+// ▼▼▼ 【全新】为角色手机浏览器添加图片点击弹窗事件 ▼▼▼
+        document.getElementById('char-article-content').addEventListener('click', (e) => {
+            // 检查被点击的是否是带有 data-description 属性的图片
+            if (e.target.tagName === 'IMG' && e.target.dataset.description) {
+                const description = e.target.dataset.description;
+                // 复用现有的弹窗函数来显示描述
+                showCustomAlert("图片内容", description);
+            }
+        });
+        // ▲▲▲ 新增代码结束 ▲▲▲
 
 /**
  * 【总入口】为新播放器的所有按钮和事件绑定功能
